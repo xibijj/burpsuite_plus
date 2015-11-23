@@ -12,17 +12,17 @@ from burp import IHttpListener
 from burp import IHttpRequestResponse
 from burp import IRequestInfo
 
-import re
+#import re
 import urllib2
-import urllib
+#import requests
 # Class BurpExtender (Required) contaning all functions used to interact with Burp Suite API
 
 print 'Mr.x'
 
 #autoSqlmap proxy setting
-autoSqlmap_proxy = {'http' : 'http://127.0.0.1:8888/'}
+autoSqlmap_proxy = {'http' : 'http://1.1.1.1:8888/'}
 #your test host list
-sniffer_host = ['192.168.31.171','test.cn']
+sniffer_host = ['1.1.1.1','test.cn']
 #filte file list 
 filter_file = ['.css', '.js', '.jpg', '.jpeg', '.gif', '.png', '.bmp', '.html', '.htm', '.swf', '.svg']
 
@@ -46,8 +46,8 @@ class BurpExtender(IBurpExtender, IHttpListener):
 		
 		# determine what tool we would like to pass though our extension:
 		#print toolFlag
-		#if toolFlag == 64: #if tool is repeater
-		if toolFlag == 4: #if tool is Proxy Tab
+		#if toolFlag == 64: #if tool 64 is repeater
+		if toolFlag == 4 or toolFlag == 8: #if tool 4 is Proxy Tab 8 is Spider
 			# determine if request or response:
 			if messageIsRequest:#only handle responses
 				request = messageInfo.getRequest()
@@ -107,20 +107,5 @@ class BurpExtender(IBurpExtender, IHttpListener):
 				
 				#print response.read()
 				print '%s %s' %(method,trg_url)
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
 				
 				
