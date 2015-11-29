@@ -3,8 +3,8 @@
 ''''' 
 Created on 2015-11-22
 @author: Mr.x
-Email: coolxia [AT] foxmail.com
-burpsuite结合autoSqlmap用，自动检测burpsuite proxy中的url是否存在Sqli注入漏洞
+Email: coolxia@foxmail.com
+burpsuite结合autoSqlmap用，自动检测burpsuite proxy中的url
 需要jython2.7b4支持
 '''
 from burp import IBurpExtender
@@ -12,17 +12,17 @@ from burp import IHttpListener
 from burp import IHttpRequestResponse
 from burp import IRequestInfo
 
-#import re
+import re
 import urllib2
-#import requests
+import urllib
 # Class BurpExtender (Required) contaning all functions used to interact with Burp Suite API
 
 print 'Mr.x'
 
 #autoSqlmap proxy setting
-autoSqlmap_proxy = {'http' : 'http://1.1.1.1:8888/'}
+autoSqlmap_proxy = {'http' : 'http://127.0.0.1:8888/'}
 #your test host list
-sniffer_host = ['1.1.1.1','test.cn']
+sniffer_host = ['baidu.com','test.cn']
 #filte file list 
 filter_file = ['.css', '.js', '.jpg', '.jpeg', '.gif', '.png', '.bmp', '.html', '.htm', '.swf', '.svg']
 
@@ -46,7 +46,7 @@ class BurpExtender(IBurpExtender, IHttpListener):
 		
 		# determine what tool we would like to pass though our extension:
 		#print toolFlag
-		#if toolFlag == 64: #if tool 64 is repeater
+		#if toolFlag == 64: #if tool is repeater
 		if toolFlag == 4 or toolFlag == 8: #if tool 4 is Proxy Tab 8 is Spider
 			# determine if request or response:
 			if messageIsRequest:#only handle responses
@@ -77,6 +77,9 @@ class BurpExtender(IBurpExtender, IHttpListener):
 					elif columns.find("Content-Type") == 0:
 						content_type = columns.replace('Content-Type: ','')
 						headers_arr['Content-Type'] = content_type
+					elif columns.find("User-Agent") == 0:
+						agent = columns.replace('User-Agent: ','')
+						headers_arr['User-Agent'] = agent
 					elif columns.find("Host") == 0:
 						host = columns.replace('Host: ','')
 						
@@ -99,6 +102,8 @@ class BurpExtender(IBurpExtender, IHttpListener):
 				proxy = urllib2.ProxyHandler(autoSqlmap_proxy)
 				opener = urllib2.build_opener(proxy)
 				urllib2.install_opener(opener)
+				
+				#http请求拼接
 				if method == 'GET':
 					req = urllib2.Request(url=trg_url,headers=headers_arr)
 				elif method == 'POST':
@@ -107,5 +112,20 @@ class BurpExtender(IBurpExtender, IHttpListener):
 				
 				#print response.read()
 				print '%s %s' %(method,trg_url)
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
 				
 				
