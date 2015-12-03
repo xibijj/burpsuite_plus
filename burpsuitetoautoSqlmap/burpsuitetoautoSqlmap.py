@@ -20,9 +20,10 @@ import urllib
 print 'Mr.x'
 
 #autoSqlmap proxy setting
+#autoSqlmap_proxy = {'http' : 'http://127.0.0.1:8888/'}
 autoSqlmap_proxy = {'http' : 'http://127.0.0.1:8888/'}
 #your test host list
-sniffer_host = ['baidu.com','test.cn']
+sniffer_host = ['192.168.31.254','m.haijincang.com']
 #filte file list 
 filter_file = ['.css', '.js', '.jpg', '.jpeg', '.gif', '.png', '.bmp', '.html', '.htm', '.swf', '.svg']
 
@@ -67,51 +68,45 @@ class BurpExtender(IBurpExtender, IHttpListener):
 				headers_arr = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
 				
 				for columns in headers:
-					#print columns
-					if columns.find("Referer") == 0:
-						referer = columns.replace('Referer: ','')
-						headers_arr['Referer'] = referer
-					elif columns.find("Cookie") == 0:
-						cookie = columns.replace('Cookie: ','')
-						headers_arr['Cookie'] = cookie
-					elif columns.find("Content-Type") == 0:
-						content_type = columns.replace('Content-Type: ','')
-						headers_arr['Content-Type'] = content_type
-					elif columns.find("User-Agent") == 0:
-						agent = columns.replace('User-Agent: ','')
-						headers_arr['User-Agent'] = agent
-					elif columns.find("Host") == 0:
-						host = columns.replace('Host: ','')
+					#print columns # 优化获取headers算法
+					if columns.find(": ") > 0:
+						key_value = columns.split(': ')
+						key = key_value[0]
+						value = key_value[1]
+						if key == "Host":
+							trg_host = value
+						else:
+							headers_arr[key] = value
 						
 				#print headers_arr
-				#print trg_url
 				
 				############# Request filters ################
 				
 				#if Request host not in sniffer_host the process 
-				if host not in sniffer_host : return
+				if trg_host not in sniffer_host : return
 				
+				c_trg_url = trg_url.split('?')
 				for f in filter_file:
-					if trg_url.endswith(f) == True : 
+					if c_trg_url[0].endswith(f) == True : 
 						return
 				
 				############# Request to proxy ################
 				
-				#print "go proxy"
-				
-				proxy = urllib2.ProxyHandler(autoSqlmap_proxy)
-				opener = urllib2.build_opener(proxy)
-				urllib2.install_opener(opener)
-				
-				#http请求拼接
-				if method == 'GET':
-					req = urllib2.Request(url=trg_url,headers=headers_arr)
-				elif method == 'POST':
-					req = urllib2.Request(url=trg_url, data=str(body_string), headers=headers_arr)
-				response = urllib2.urlopen(req)
-				
-				#print response.read()
-				print '%s %s' %(method,trg_url)
+				try:
+					proxy = urllib2.ProxyHandler(autoSqlmap_proxy)
+					opener = urllib2.build_opener(proxy)
+					urllib2.install_opener(opener)
+					
+					#http请求拼接
+					if method == 'GET':
+						req = urllib2.Request(url=trg_url,headers=headers_arr)
+					elif method == 'POST':
+						req = urllib2.Request(url=trg_url, data=str(body_string), headers=headers_arr)
+					response = urllib2.urlopen(req)
+					
+					print '%s %s' %(method,trg_url)
+				except Exception,e:
+					print "[!] ERR:%s"%e
 				
 				
 				
