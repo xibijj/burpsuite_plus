@@ -12,9 +12,7 @@ from burp import IHttpListener
 from burp import IHttpRequestResponse
 from burp import IRequestInfo
 
-import re
 import urllib2
-import urllib
 # Class BurpExtender (Required) contaning all functions used to interact with Burp Suite API
 
 print 'Mr.x'
@@ -65,8 +63,7 @@ class BurpExtender(IBurpExtender, IHttpListener):
 				
 				############# Get Request Head ################
 				
-				headers_arr = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
-				
+				headers_arr = {}
 				for columns in headers:
 					#print columns # 优化获取headers算法
 					if columns.find(": ") > 0:
